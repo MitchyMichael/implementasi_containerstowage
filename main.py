@@ -1,34 +1,11 @@
-from formula import load_containers_from_csv, summarize_plan
+from formula import summarize_plan, get_containers
 from pso_class import PSO_Stowage_Planner
 from ship_data import ship_data
-
-import random
 import numpy as np
-import pandas as pd
-import os
 
 TOTAL_VALID_SLOTS_20FT, NUM_20FT_TO_LOAD, NUM_40FT_TO_LOAD, SLOT_PROPERTIES_20FT, VALID_SLOT_MASK_20FT, VALID_PLACEMENTS_40FT, SLOT_PROPERTIES_40FT, MAX_ITERATIONS, TIERS, NUM_PARTICLES, WEIGHT_PENALTY, BAYS, MAX_ROWS = ship_data()
 
-# MARK: Final
-# ================================================================================================================================================================
-# Folder export
-EXPORT_DIR = "export"
-os.makedirs(EXPORT_DIR, exist_ok=True)
-
-# Ganti nama file ini dengan nama file data kontainer Anda
-csv_filename = os.path.join(EXPORT_DIR, "containers.csv")
-
-# Membuat file CSV dummy jika tidak ada, untuk keperluan pengujian
-if not os.path.exists(csv_filename):
-    print(f"File '{csv_filename}' tidak ditemukan. Membuat file dummy...")
-    num_total_containers = TOTAL_VALID_SLOTS_20FT 
-    ids = [f'CONT{i:04d}' for i in range(1, num_total_containers + 1)]
-    weights = [random.uniform(5, 28) for _ in range(num_total_containers)]
-    sizes = [40 if random.random() < 0.35 else 20 for _ in range(num_total_containers)]
-    pd.DataFrame({'Container_ID': ids, 'Weight_ton': weights, 'Size': sizes}).to_csv(csv_filename, index=False)
-
-all_containers = load_containers_from_csv(csv_filename)
-
+all_containers = get_containers(TOTAL_VALID_SLOTS_20FT)
 if all_containers:
     num_avail_20ft, num_avail_40ft = sum(1 for c in all_containers if c['size'] == 20), sum(1 for c in all_containers if c['size'] == 40)
     if num_avail_20ft < NUM_20FT_TO_LOAD or num_avail_40ft < NUM_40FT_TO_LOAD:

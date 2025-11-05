@@ -1,6 +1,7 @@
 import numpy as np
 import os
 import pandas as pd
+import random
 
 # MARK: Build ship geo
 def build_ship_geometry(TIERS, BAYS, MAX_ROWS, SHIP_LAYOUT, ROW_MAP, BAY_MAP, TIER_MAP):
@@ -105,3 +106,22 @@ def summarize_plan(summary, target_lcg):
     tcg_status = "✅ Berhasil" if abs(final_tcg) < 0.2 else "⚠️ Gagal"
     print(f"   - TCG Total: {final_tcg:.4f} m (Target: |TCG| < 0.2 m) - Status: {tcg_status}")
 
+# MARK: Get Containers
+def get_containers(TOTAL_VALID_SLOTS_20FT):
+    EXPORT_DIR = "export"
+    os.makedirs(EXPORT_DIR, exist_ok=True)
+
+    # Ganti nama file ini dengan nama file data kontainer Anda
+    csv_filename = os.path.join(EXPORT_DIR, "containers.csv")
+
+    # Membuat file CSV dummy jika tidak ada, untuk keperluan pengujian
+    if not os.path.exists(csv_filename):
+        print(f"File '{csv_filename}' tidak ditemukan. Membuat file dummy...")
+        num_total_containers = TOTAL_VALID_SLOTS_20FT 
+        ids = [f'CONT{i:04d}' for i in range(1, num_total_containers + 1)]
+        weights = [random.uniform(5, 28) for _ in range(num_total_containers)]
+        sizes = [40 if random.random() < 0.35 else 20 for _ in range(num_total_containers)]
+        pd.DataFrame({'Container_ID': ids, 'Weight_ton': weights, 'Size': sizes}).to_csv(csv_filename, index=False)
+
+    all_containers = load_containers_from_csv(csv_filename) 
+    return all_containers
