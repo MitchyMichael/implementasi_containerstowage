@@ -104,3 +104,4 @@ def summarize_plan(summary, target_lcg):
     print(f"   - VCG Total: {final_vcg:.4f} m")
     tcg_status = "✅ Berhasil" if abs(final_tcg) < 0.2 else "⚠️ Gagal"
     print(f"   - TCG Total: {final_tcg:.4f} m (Target: |TCG| < 0.2 m) - Status: {tcg_status}")
+
