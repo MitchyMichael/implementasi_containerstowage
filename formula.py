@@ -2,6 +2,7 @@ import numpy as np
 import os
 import pandas as pd
 
+# MARK: Build ship geo
 def build_ship_geometry(TIERS, BAYS, MAX_ROWS, SHIP_LAYOUT, ROW_MAP, BAY_MAP, TIER_MAP):
     """Membangun geometri kapal dari SHIP_LAYOUT."""
     num_tiers, num_bays = len(TIERS), len(BAYS)
@@ -23,6 +24,7 @@ def build_ship_geometry(TIERS, BAYS, MAX_ROWS, SHIP_LAYOUT, ROW_MAP, BAY_MAP, TI
                     slot_properties[(t_idx, b_idx, r_idx)] = {'lcg': lcg, 'vcg': vcg, 'tcg': tcg}
     return valid_mask, slot_properties
 
+# MARK: Build 40ft
 def build_40ft_slots(valid_mask, slot_properties_20ft, BAYS, ALLOWED_40FT_BAYS, TIERS, INVALID_40FT_SLOTS):
     """Mencari semua kemungkinan penempatan untuk kontainer 40ft dengan memeriksa daftar pengecualian."""
     valid_placements_40ft, properties_40ft = [], {}
@@ -43,6 +45,7 @@ def build_40ft_slots(valid_mask, slot_properties_20ft, BAYS, ALLOWED_40FT_BAYS, 
                     properties_40ft[coords_40ft] = {'lcg': (props1['lcg'] + props2['lcg']) / 2.0, 'vcg': props1['vcg'], 'tcg': props1['tcg']}
     return valid_placements_40ft, properties_40ft
 
+# MARK: Calculate target lcg
 def calculate_target_lcg(lightship_data, tanks_data):
     """Menghitung LCG target berdasarkan kondisi kapal tanpa kargo."""
     total_weight, total_moment_l = lightship_data['weight'], lightship_data['weight'] * lightship_data['lcg']

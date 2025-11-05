@@ -83,8 +83,8 @@ print(f"   - Slot 40ft Valid (setelah filter): {TOTAL_VALID_SLOTS_40FT}")
 class PSO_Stowage_Planner:
     """Kelas utama untuk menjalankan algoritma PSO untuk Stowage Planning."""
     def __init__(self, all_containers, lightship_data, tanks_data, 
-                 slot_properties_20ft, valid_mask_20ft, 
-                 valid_placements_40ft, slot_properties_40ft, target_lcg):
+                slot_properties_20ft, valid_mask_20ft, 
+                valid_placements_40ft, slot_properties_40ft, target_lcg):
         self.lightship_weight, self.lightship_lcg, self.lightship_vcg, self.lightship_tcg = lightship_data.values()
         self.tanks_data, self.slot_properties_20ft, self.valid_mask = tanks_data, slot_properties_20ft, valid_mask_20ft
         self.valid_slots_coords_20ft, self.valid_placements_40ft = list(slot_properties_20ft.keys()), valid_placements_40ft
