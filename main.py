@@ -1,7 +1,10 @@
 from formula import summarize_plan, get_containers
 from pso_class import PSO_Stowage_Planner
-from ship_data import ship_data
+from ship_data import ship_data, read_ship_xlsx, read_ship_xlsx_all
 import numpy as np
+
+data = read_ship_xlsx(expected_sheets=["Bays", "Tiers", "Rows", "Slots"])
+by_sheet, flat = read_ship_xlsx_all(expected_sheets=["Bays", "Tiers", "Rows", "Slots"])
 
 TOTAL_VALID_SLOTS_20FT, NUM_20FT_TO_LOAD, NUM_40FT_TO_LOAD, SLOT_PROPERTIES_20FT, VALID_SLOT_MASK_20FT, VALID_PLACEMENTS_40FT, SLOT_PROPERTIES_40FT, MAX_ITERATIONS, TIERS, NUM_PARTICLES, WEIGHT_PENALTY, BAYS, MAX_ROWS = ship_data()
 

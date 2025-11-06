@@ -1,4 +1,149 @@
+import pandas as pd
+import os
+import json
+
 from formula import build_ship_geometry, build_40ft_slots
+
+import os
+import json
+import pandas as pd
+
+def _coerce_numbers_in_records(rows: list[dict]) -> list[dict]:
+    """Coba konversi string numerik ke angka (int/float) agar data lebih bersih."""
+    def to_number(v):
+        if isinstance(v, str):
+            s = v.strip().replace(",", "")  # buang koma pemisah ribuan
+            if s == "":
+                return v
+            try:
+                # coba int dulu agar '12' tidak jadi 12.0
+                i = int(s)
+                return i
+            except ValueError:
+                try:
+                    f = float(s)
+                    return f
+                except ValueError:
+                    return v
+        return v
+
+    out = []
+    for r in rows:
+        out.append({k: to_number(v) for k, v in r.items()})
+    return out
+
+def read_ship_xlsx_all(expected_sheets: list[str] | None = None,
+                    lowercase_headers: bool = True,
+                    include_sheet_col: bool = True):
+    """
+    Gunakan read_ship_xlsx(...) untuk baca semua sheet,
+    lalu kembalikan:
+    - data_by_sheet: dict {sheet_name: [row_dict, ...]}
+    - data_flat: list gabungan semua baris dari semua sheet.
+    """
+    data_by_sheet = read_ship_xlsx(expected_sheets=expected_sheets,
+                                lowercase_headers=lowercase_headers)
+
+    # Coerce angka & flatten
+    data_flat = []
+    for sheet_name, rows in data_by_sheet.items():
+        rows = _coerce_numbers_in_records(rows)
+        for r in rows:
+            if include_sheet_col and "__sheet__" not in r:
+                r = dict(r)
+                r["__sheet__"] = sheet_name
+            data_flat.append(r)
+
+    return data_by_sheet, data_flat
+
+def export_ship_xlsx_all(outdir: str = "./export_ship_data",
+                        expected_sheets: list[str] | None = None,
+                        lowercase_headers: bool = True):
+    """
+    Ekspor semua data ke:
+    - Per-sheet CSV: <outdir>/<sheet>.csv
+    - Satu CSV gabungan: <outdir>/all_sheets.csv
+    - JSON gabungan: <outdir>/all_sheets.json
+    Return path berkas yang dibuat.
+    """
+    os.makedirs(outdir, exist_ok=True)
+    data_by_sheet, data_flat = read_ship_xlsx_all(
+        expected_sheets=expected_sheets,
+        lowercase_headers=lowercase_headers,
+        include_sheet_col=True
+    )
+
+    written = []
+
+    # Tulis per-sheet CSV
+    for sheet_name, rows in data_by_sheet.items():
+        # Coerce angka biar rapi juga di per-sheet
+        rows = _coerce_numbers_in_records(rows)
+        df = pd.DataFrame(rows)
+        path_csv = os.path.join(outdir, f"{sheet_name}.csv")
+        df.to_csv(path_csv, index=False)
+        written.append(path_csv)
+
+    # Tulis CSV gabungan
+    df_all = pd.DataFrame(data_flat)
+    path_all_csv = os.path.join(outdir, "all_sheets.csv")
+    df_all.to_csv(path_all_csv, index=False)
+    written.append(path_all_csv)
+
+    # Tulis JSON gabungan
+    path_all_json = os.path.join(outdir, "all_sheets.json")
+    with open(path_all_json, "w", encoding="utf-8") as f:
+        json.dump(data_flat, f, ensure_ascii=False, indent=2)
+    written.append(path_all_json)
+
+    print(f"✅ Eksport selesai. Berkas tersimpan di: {outdir}")
+    return written
+
+# MARK: Read Ship XLSX
+def read_ship_xlsx(expected_sheets: list[str] | None = None,
+                        lowercase_headers: bool = True) -> dict[str, list[dict]]:
+    """
+    Baca semua sheet dari ./archive/ship_slot.xlsx
+    Return: { "Sheet1": [ {col: val, ...}, ... ], "Sheet2": [...], ... }
+
+    - expected_sheets: jika diisi, fungsi akan validasi nama sheet wajib ada.
+    - lowercase_headers: jika True, header akan dinormalisasi ke huruf kecil & strip spasi.
+    """
+    file_path = "./archive/ship_slot.xlsx"
+
+    if not os.path.exists(file_path):
+        raise FileNotFoundError(f"File tidak ditemukan: {file_path}")
+
+    # Baca semua sheet (dict of DataFrame)
+    # sheet_name=None => {sheet_name: DataFrame}
+    xl: dict[str, pd.DataFrame] = pd.read_excel(file_path, sheet_name=None)
+
+    if expected_sheets:
+        missing = [s for s in expected_sheets if s not in xl]
+        if missing:
+            raise ValueError(f"Sheet berikut tidak ditemukan: {missing}. "
+                            f"Sheet yang ada: {list(xl.keys())}")
+
+    result: dict[str, list[dict]] = {}
+    for name, df in xl.items():
+        # Bersihkan header kolom
+        df.columns = df.columns.astype(str).str.strip()
+        if lowercase_headers:
+            df.columns = df.columns.str.lower()
+
+        # Drop baris kosong total (semua NaN)
+        df = df.dropna(how="all")
+
+        # Opsional: trim string cells
+        for c in df.select_dtypes(include=["object"]).columns:
+            df[c] = df[c].astype(str).str.strip()
+
+        result[name] = df.to_dict(orient="records")
+
+    print(f"📄 File memuat {len(xl)} sheet: {list(xl.keys())}")
+    total_rows = sum(len(v) for v in result.values())
+    print(f"📦 Total baris dari semua sheet: {total_rows}")
+    return result
 
 def ship_data():
     # MARK: Data Fisik Kapal
