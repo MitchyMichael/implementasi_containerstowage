@@ -1,12 +1,9 @@
 import pandas as pd
-import os
+import os, json, re
 import json
 
 from formula import build_ship_geometry, build_40ft_slots
-
-import os
-import json
-import pandas as pd
+from pathlib import Path
 
 def _coerce_numbers_in_records(rows: list[dict]) -> list[dict]:
     """Coba konversi string numerik ke angka (int/float) agar data lebih bersih."""
@@ -32,6 +29,7 @@ def _coerce_numbers_in_records(rows: list[dict]) -> list[dict]:
         out.append({k: to_number(v) for k, v in r.items()})
     return out
 
+# MARK: Read Ship All
 def read_ship_xlsx_all(expected_sheets: list[str] | None = None,
                     lowercase_headers: bool = True,
                     include_sheet_col: bool = True):
@@ -54,50 +52,39 @@ def read_ship_xlsx_all(expected_sheets: list[str] | None = None,
                 r["__sheet__"] = sheet_name
             data_flat.append(r)
 
-    return data_by_sheet, data_flat
+    debugexport_txtfile(data_by_sheet)
+    
+    rbays = []
+    rtiers = []
+    rrows = []
+    rslots = []
 
-def export_ship_xlsx_all(outdir: str = "./export_ship_data",
-                        expected_sheets: list[str] | None = None,
-                        lowercase_headers: bool = True):
-    """
-    Ekspor semua data ke:
-    - Per-sheet CSV: <outdir>/<sheet>.csv
-    - Satu CSV gabungan: <outdir>/all_sheets.csv
-    - JSON gabungan: <outdir>/all_sheets.json
-    Return path berkas yang dibuat.
-    """
-    os.makedirs(outdir, exist_ok=True)
-    data_by_sheet, data_flat = read_ship_xlsx_all(
-        expected_sheets=expected_sheets,
-        lowercase_headers=lowercase_headers,
-        include_sheet_col=True
-    )
+    for sheet_name, data in data_by_sheet.items():
+        if sheet_name.lower() == "bays":
+            rbays = data
+        elif sheet_name.lower() == "tiers":
+            rtiers = data
+        elif sheet_name.lower() == "rows":
+            rrows = data
+        elif sheet_name.lower() == "slots":
+            rslots = data
+            
+    return rbays, rtiers, rrows, rslots
 
-    written = []
+# MARK: Export ship data to txt (for debug)
+def debugexport_txtfile(by_sheet):
+    export_dir = Path("export/debug_txt")
+    export_dir.mkdir(parents=True, exist_ok=True)
 
-    # Tulis per-sheet CSV
-    for sheet_name, rows in data_by_sheet.items():
-        # Coerce angka biar rapi juga di per-sheet
-        rows = _coerce_numbers_in_records(rows)
-        df = pd.DataFrame(rows)
-        path_csv = os.path.join(outdir, f"{sheet_name}.csv")
-        df.to_csv(path_csv, index=False)
-        written.append(path_csv)
+    def safe_name(name: str) -> str:
+        # Ganti karakter yang tidak aman untuk nama file
+        return re.sub(r'[^\w\-. ]+', '_', name)
 
-    # Tulis CSV gabungan
-    df_all = pd.DataFrame(data_flat)
-    path_all_csv = os.path.join(outdir, "all_sheets.csv")
-    df_all.to_csv(path_all_csv, index=False)
-    written.append(path_all_csv)
-
-    # Tulis JSON gabungan
-    path_all_json = os.path.join(outdir, "all_sheets.json")
-    with open(path_all_json, "w", encoding="utf-8") as f:
-        json.dump(data_flat, f, ensure_ascii=False, indent=2)
-    written.append(path_all_json)
-
-    print(f"✅ Eksport selesai. Berkas tersimpan di: {outdir}")
-    return written
+    for sheet_name, data in by_sheet.items():
+        filename = export_dir / f"{safe_name(sheet_name)}.txt"
+        with open(filename, "w", encoding="utf-8") as f:
+            json.dump(data, f, indent=4, ensure_ascii=False)
+        print(f"✅ {filename} berhasil dibuat.")
 
 # MARK: Read Ship XLSX
 def read_ship_xlsx(expected_sheets: list[str] | None = None,
@@ -145,8 +132,8 @@ def read_ship_xlsx(expected_sheets: list[str] | None = None,
     print(f"📦 Total baris dari semua sheet: {total_rows}")
     return result
 
+# MARK: Default - Data Fisik Kapal
 def ship_data():
-    # MARK: Data Fisik Kapal
     # ===============================================================================================================================================
     # --- Data Fisik Kapal ---
     BAY_MAP = {

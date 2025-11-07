@@ -1,0 +1,65 @@
+[
+    {
+        "no.": 1,
+        "row id": 151,
+        "ship id": 2004,
+        "name": 8,
+        "base tcg": -8853
+    },
+    {
+        "no.": 2,
+        "row id": 149,
+        "ship id": 2004,
+        "name": 6,
+        "base tcg": -6335
+    },
+    {
+        "no.": 3,
+        "row id": 147,
+        "ship id": 2004,
+        "name": 4,
+        "base tcg": -3817
+    },
+    {
+        "no.": 4,
+        "row id": 145,
+        "ship id": 2004,
+        "name": 2,
+        "base tcg": -1299
+    },
+    {
+        "no.": 5,
+        "row id": 143,
+        "ship id": 2004,
+        "name": 0,
+        "base tcg": 0
+    },
+    {
+        "no.": 6,
+        "row id": 144,
+        "ship id": 2004,
+        "name": 1,
+        "base tcg": 1299
+    },
+    {
+        "no.": 7,
+        "row id": 146,
+        "ship id": 2004,
+        "name": 3,
+        "base tcg": 3817
+    },
+    {
+        "no.": 8,
+        "row id": 148,
+        "ship id": 2004,
+        "name": 5,
+        "base tcg": 6335
+    },
+    {
+        "no.": 9,
+        "row id": 150,
+        "ship id": 2004,
+        "name": 7,
+        "base tcg": 8853
+    }
+]
