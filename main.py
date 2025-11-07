@@ -4,10 +4,8 @@ from ship_data import ship_data, read_ship_xlsx_all
 from container_data import read_container_array
 import numpy as np
 
-# MARK: Read Ship Data
+# MARK: Read Excel
 bays, tiers, rows, slots = read_ship_xlsx_all(expected_sheets=["Bays", "Tiers", "Rows", "Slots"])
-
-# MARK: Read Container Data
 containers = read_container_array("./archive/container.xlsx")
 
 # print("")
@@ -40,6 +38,7 @@ containers = read_container_array("./archive/container.xlsx")
 # Banyak Container 100
 # [{'no': 1, 'booking_no': nan, 'container_id': nan, 'bay': None, 'row': None, 'tier': None, 'slot': nan, 'load_port': 'IDSUB', 'discharge_port': 'IDJKT', 'container_iso': 2000, 'size_ft': 20, 'fe': 'F', 'weight_vgm_kg': 10.0, 'weight_ton': 0.01, 'un_no': None, 'dg_class': nan, 'group_type': nan, 'over_height': None, 'oversize_left': None, 'oversize_right': None, 'oversize_front': None, 'oversize_aft': None, 'carrier': nan, 'commodity': nan, 'weight_vgm': 10}]
 
+# MARK: Default Variable Value
 TOTAL_VALID_SLOTS_20FT, NUM_20FT_TO_LOAD, NUM_40FT_TO_LOAD, SLOT_PROPERTIES_20FT, VALID_SLOT_MASK_20FT, VALID_PLACEMENTS_40FT, SLOT_PROPERTIES_40FT, MAX_ITERATIONS, TIERS, NUM_PARTICLES, WEIGHT_PENALTY, BAYS, MAX_ROWS = ship_data()
 
 all_containers = get_containers(TOTAL_VALID_SLOTS_20FT)
