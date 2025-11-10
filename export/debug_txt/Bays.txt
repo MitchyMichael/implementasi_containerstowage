@@ -14,7 +14,10 @@
         "base lcg": 126158,
         "p": 6.23999977111816,
         "l": 0,
-        "path": "file:/C:/Users/ISTOW/iStowV2/assets/images//2004_MVPranalaContainerX_bay 1.png"
+        "path": "file:/C:/Users/ISTOW/iStowV2/assets/images//2004_MVPranalaContainerX_bay 1.png",
+        "lpp": 151.160003662109,
+        "midship": 75.5800018310547,
+        "base lcg - midship": -50.577995300293
     },
     {
         "no.": 2,
@@ -31,7 +34,10 @@
         "base lcg": 120024,
         "p": 6.23999977111816,
         "l": 0,
-        "path": "file:/C:/Users/ISTOW/iStowV2/assets/images//2004_MVPranalaContainerX_bay 1.png"
+        "path": "file:/C:/Users/ISTOW/iStowV2/assets/images//2004_MVPranalaContainerX_bay 1.png",
+        "lpp": 151.160003662109,
+        "midship": 75.5800018310547,
+        "base lcg - midship": -44.4440002441406
     },
     {
         "no.": 3,
@@ -48,7 +54,10 @@
         "base lcg": 112478,
         "p": 6.23999977111816,
         "l": 0,
-        "path": "file:/C:/Users/ISTOW/iStowV2/assets/images//2004_MVPranalaContainerX_bay 7.png"
+        "path": "file:/C:/Users/ISTOW/iStowV2/assets/images//2004_MVPranalaContainerX_bay 7.png",
+        "lpp": 151.160003662109,
+        "midship": 75.5800018310547,
+        "base lcg - midship": -36.8979949951172
     },
     {
         "no.": 4,
@@ -65,7 +74,10 @@
         "base lcg": 106344,
         "p": 6.23999977111816,
         "l": 0,
-        "path": "file:/C:/Users/ISTOW/iStowV2/assets/images//2004_MVPranalaContainerX_bay 7.png"
+        "path": "file:/C:/Users/ISTOW/iStowV2/assets/images//2004_MVPranalaContainerX_bay 7.png",
+        "lpp": 151.160003662109,
+        "midship": 75.5800018310547,
+        "base lcg - midship": -30.7639999389648
     },
     {
         "no.": 5,
@@ -82,7 +94,10 @@
         "base lcg": 98742,
         "p": 6.23999977111816,
         "l": 0,
-        "path": "file:/C:/Users/ISTOW/iStowV2/assets/images//2004_MVPranalaContainerX_bay 9-31.png"
+        "path": "file:/C:/Users/ISTOW/iStowV2/assets/images//2004_MVPranalaContainerX_bay 9-31.png",
+        "lpp": 151.160003662109,
+        "midship": 75.5800018310547,
+        "base lcg - midship": -23.161994934082
     },
     {
         "no.": 6,
@@ -99,7 +114,10 @@
         "base lcg": 92608,
         "p": 6.23999977111816,
         "l": 0,
-        "path": "file:/C:/Users/ISTOW/iStowV2/assets/images//2004_MVPranalaContainerX_bay 9-31.png"
+        "path": "file:/C:/Users/ISTOW/iStowV2/assets/images//2004_MVPranalaContainerX_bay 9-31.png",
+        "lpp": 151.160003662109,
+        "midship": 75.5800018310547,
+        "base lcg - midship": -17.0279998779297
     },
     {
         "no.": 7,
@@ -116,7 +134,10 @@
         "base lcg": 86374,
         "p": 6.23999977111816,
         "l": 0,
-        "path": "file:/C:/Users/ISTOW/iStowV2/assets/images//2004_MVPranalaContainerX_bay 9-31.png"
+        "path": "file:/C:/Users/ISTOW/iStowV2/assets/images//2004_MVPranalaContainerX_bay 9-31.png",
+        "lpp": 151.160003662109,
+        "midship": 75.5800018310547,
+        "base lcg - midship": -10.7939987182617
     },
     {
         "no.": 8,
@@ -133,7 +154,10 @@
         "base lcg": 80234,
         "p": 6.23999977111816,
         "l": 0,
-        "path": "file:/C:/Users/ISTOW/iStowV2/assets/images//2004_MVPranalaContainerX_bay 9-31.png"
+        "path": "file:/C:/Users/ISTOW/iStowV2/assets/images//2004_MVPranalaContainerX_bay 9-31.png",
+        "lpp": 151.160003662109,
+        "midship": 75.5800018310547,
+        "base lcg - midship": -4.65399932861328
     },
     {
         "no.": 9,
@@ -150,7 +174,10 @@
         "base lcg": 72582,
         "p": 6.23999977111816,
         "l": 0,
-        "path": "file:/C:/Users/ISTOW/iStowV2/assets/images//2004_MVPranalaContainerX_bay 9-31.png"
+        "path": "file:/C:/Users/ISTOW/iStowV2/assets/images//2004_MVPranalaContainerX_bay 9-31.png",
+        "lpp": 151.160003662109,
+        "midship": 75.5800018310547,
+        "base lcg - midship": 2.99800109863281
     },
     {
         "no.": 10,
@@ -167,7 +194,10 @@
         "base lcg": 66448,
         "p": 6.23999977111816,
         "l": 0,
-        "path": "file:/C:/Users/ISTOW/iStowV2/assets/images//2004_MVPranalaContainerX_bay 9-31.png"
+        "path": "file:/C:/Users/ISTOW/iStowV2/assets/images//2004_MVPranalaContainerX_bay 9-31.png",
+        "lpp": 151.160003662109,
+        "midship": 75.5800018310547,
+        "base lcg - midship": 9.13200378417969
     },
     {
         "no.": 11,
@@ -184,7 +214,10 @@
         "base lcg": 60214,
         "p": 6.23999977111816,
         "l": 0,
-        "path": "file:/C:/Users/ISTOW/iStowV2/assets/images//2004_MVPranalaContainerX_bay 9-31.png"
+        "path": "file:/C:/Users/ISTOW/iStowV2/assets/images//2004_MVPranalaContainerX_bay 9-31.png",
+        "lpp": 151.160003662109,
+        "midship": 75.5800018310547,
+        "base lcg - midship": 15.3660011291504
     },
     {
         "no.": 12,
@@ -201,7 +234,10 @@
         "base lcg": 54080,
         "p": 6.23999977111816,
         "l": 0,
-        "path": "file:/C:/Users/ISTOW/iStowV2/assets/images//2004_MVPranalaContainerX_bay 9-31.png"
+        "path": "file:/C:/Users/ISTOW/iStowV2/assets/images//2004_MVPranalaContainerX_bay 9-31.png",
+        "lpp": 151.160003662109,
+        "midship": 75.5800018310547,
+        "base lcg - midship": 21.5
     },
     {
         "no.": 13,
@@ -218,7 +254,10 @@
         "base lcg": 46422,
         "p": 6.23999977111816,
         "l": 0,
-        "path": "file:/C:/Users/ISTOW/iStowV2/assets/images//2004_MVPranalaContainerX_bay 9-31.png"
+        "path": "file:/C:/Users/ISTOW/iStowV2/assets/images//2004_MVPranalaContainerX_bay 9-31.png",
+        "lpp": 151.160003662109,
+        "midship": 75.5800018310547,
+        "base lcg - midship": 29.1580009460449
     },
     {
         "no.": 14,
@@ -235,7 +274,10 @@
         "base lcg": 40288,
         "p": 6.23999977111816,
         "l": 0,
-        "path": "file:/C:/Users/ISTOW/iStowV2/assets/images//2004_MVPranalaContainerX_bay 9-31.png"
+        "path": "file:/C:/Users/ISTOW/iStowV2/assets/images//2004_MVPranalaContainerX_bay 9-31.png",
+        "lpp": 151.160003662109,
+        "midship": 75.5800018310547,
+        "base lcg - midship": 35.2920036315918
     },
     {
         "no.": 15,
@@ -252,7 +294,10 @@
         "base lcg": 34054,
         "p": 6.23999977111816,
         "l": 0,
-        "path": "file:/C:/Users/ISTOW/iStowV2/assets/images//2004_MVPranalaContainerX_bay 9-31.png"
+        "path": "file:/C:/Users/ISTOW/iStowV2/assets/images//2004_MVPranalaContainerX_bay 9-31.png",
+        "lpp": 151.160003662109,
+        "midship": 75.5800018310547,
+        "base lcg - midship": 41.5260009765625
     },
     {
         "no.": 16,
@@ -269,7 +314,10 @@
         "base lcg": 27920,
         "p": 6.23999977111816,
         "l": 0,
-        "path": "file:/C:/Users/ISTOW/iStowV2/assets/images//2004_MVPranalaContainerX_bay 9-31.png"
+        "path": "file:/C:/Users/ISTOW/iStowV2/assets/images//2004_MVPranalaContainerX_bay 9-31.png",
+        "lpp": 151.160003662109,
+        "midship": 75.5800018310547,
+        "base lcg - midship": 47.6600017547607
     },
     {
         "no.": 17,
@@ -286,7 +334,10 @@
         "base lcg": 19958,
         "p": 6.23999977111816,
         "l": 0,
-        "path": "file:/C:/Users/ISTOW/iStowV2/assets/images//2004_MVPranalaContainerX_bay 33-35.png"
+        "path": "file:/C:/Users/ISTOW/iStowV2/assets/images//2004_MVPranalaContainerX_bay 33-35.png",
+        "lpp": 151.160003662109,
+        "midship": 75.5800018310547,
+        "base lcg - midship": 55.6220016479492
     },
     {
         "no.": 18,
@@ -303,6 +354,9 @@
         "base lcg": 13824,
         "p": 6.23999977111816,
         "l": 0,
-        "path": "file:/C:/Users/ISTOW/iStowV2/assets/images//2004_MVPranalaContainerX_bay 33-35.png"
+        "path": "file:/C:/Users/ISTOW/iStowV2/assets/images//2004_MVPranalaContainerX_bay 33-35.png",
+        "lpp": 151.160003662109,
+        "midship": 75.5800018310547,
+        "base lcg - midship": 61.7560014724731
     }
 ]

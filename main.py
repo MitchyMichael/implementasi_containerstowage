@@ -13,7 +13,7 @@ if all_containers:
         print(f"   - Butuh 20ft: {NUM_20FT_TO_LOAD}, Tersedia: {num_avail_20ft}")
         print(f"   - Butuh 40ft: {NUM_40FT_TO_LOAD}, Tersedia: {num_avail_40ft}")
     else:
-        # Data kondisi kapal
+        # Data kondisi kapal7
         lightship_properties, tanks_data = datakondisikapal()
         target_lcg_value = calculate_lcg()
 

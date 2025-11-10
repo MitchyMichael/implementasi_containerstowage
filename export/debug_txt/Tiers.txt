@@ -14,7 +14,7 @@
         "p": 119,
         "bottom tier id": 0,
         "bottom tier": NaN,
-        "top tier id": 1245321,
+        "top tier id": 0,
         "top tier": NaN,
         "list slot": NaN
     },
@@ -71,7 +71,7 @@
         "p": 119,
         "bottom tier id": 0,
         "bottom tier": NaN,
-        "top tier id": 1245321,
+        "top tier id": 0,
         "top tier": NaN,
         "list slot": NaN
     },
@@ -90,7 +90,7 @@
         "p": 119,
         "bottom tier id": 0,
         "bottom tier": NaN,
-        "top tier id": 0,
+        "top tier id": 1245321,
         "top tier": NaN,
         "list slot": NaN
     },
@@ -107,9 +107,9 @@
         "special desk": false,
         "overwrite": 0,
         "p": 119,
-        "bottom tier id": 7930181,
+        "bottom tier id": 0,
         "bottom tier": NaN,
-        "top tier id": -598202328,
+        "top tier id": 0,
         "top tier": NaN,
         "list slot": NaN
     },
@@ -147,7 +147,7 @@
         "p": 119,
         "bottom tier id": 0,
         "bottom tier": NaN,
-        "top tier id": 1245321,
+        "top tier id": 0,
         "top tier": NaN,
         "list slot": NaN
     },
@@ -164,9 +164,9 @@
         "special desk": false,
         "overwrite": 0,
         "p": 119,
-        "bottom tier id": 8651076,
+        "bottom tier id": 0,
         "bottom tier": NaN,
-        "top tier id": -599625144,
+        "top tier id": 1245321,
         "top tier": NaN,
         "list slot": NaN
     },
@@ -183,7 +183,7 @@
         "special desk": false,
         "overwrite": 0,
         "p": 119,
-        "bottom tier id": 17,
+        "bottom tier id": 0,
         "bottom tier": NaN,
         "top tier id": 0,
         "top tier": NaN,
