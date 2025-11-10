@@ -136,7 +136,6 @@ def read_ship_xlsx(expected_sheets: list[str] | None = None,
 # MARK: Default - Data Fisik Kapal
 def ship_data():
     # ===============================================================================================================================================
-    # MARK: Read Excel
     bays, tiers, rows, slots = read_ship_xlsx_all(expected_sheets=["Bays", "Tiers", "Rows", "Slots"])
     containers = read_container_array("./archive/container.xlsx")
     
