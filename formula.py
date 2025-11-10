@@ -80,7 +80,7 @@ def load_containers_from_csv(filename):
         df['weight'] = df['weight'] * 1000
         if 'id' not in df.columns or 'weight' not in df.columns or 'size' not in df.columns:
             raise KeyError("Kolom yang dibutuhkan ('id', 'weight', 'size') tidak ditemukan.")
-        print(f"✅ Berhasil memuat {len(df)} kontainer dari file {filename}.")
+        # print(f"✅ Berhasil memuat {len(df)} kontainer dari file {filename}.")
         return df.to_dict('records')
     except Exception as e:
         print(f"❌ Terjadi error saat membaca file: {e}")
@@ -125,3 +125,60 @@ def get_containers(TOTAL_VALID_SLOTS_20FT):
 
     all_containers = load_containers_from_csv(csv_filename) 
     return all_containers
+
+# MARK: Formula Target LCG Value
+def calculate_lcg():
+    # --- PERUBAHAN DI SINI ---
+        
+    # Baris ini dinonaktifkan
+    # target_lcg_value = calculate_target_lcg(lightship_properties, tanks_data)
+
+    # Kode BARU untuk meminta input LCG dari user
+    target_lcg_value = None
+    while target_lcg_value is None:
+        try:
+            lcg_input = input("➡️ Masukkan Target LCG yang diinginkan (contoh: 7.5): ")
+            target_lcg_value = float(lcg_input)
+            print(f"✅ Target LCG diatur ke: {target_lcg_value} m")
+        except ValueError:
+            print("❌ Input tidak valid. Harap masukkan angka.")
+    
+    # --- Akhir Perubahan ---
+    return target_lcg_value
+
+# MARK: Formula Best Plan
+def calculate_bestplan(best_plan, stowage_planner, BAYS, TIERS, MAX_ROWS, VALID_SLOT_MASK_20FT):
+    print("\n\n--- 🗂️ Denah Muatan Lengkap (Tampilan per Tier dari Atas ke Bawah) ---")
+    CELL_WIDTH = 12
+    for tier_id in sorted(TIERS, reverse=True):
+        t_idx = TIERS.index(tier_id)
+        tier_plan = best_plan[t_idx, :, :]
+        if np.any(tier_plan != 0):
+            print(f"\n\n--- Denah untuk Tier {tier_id:02d} ---")
+            header = "Row".ljust(CELL_WIDTH)
+            b_idx = 0
+            while b_idx < len(BAYS):
+                bay_id = BAYS[b_idx]
+                if b_idx + 1 < len(BAYS) and BAYS[b_idx+1] == bay_id + 2:
+                    header += f"Bay{bay_id+1:02d} (40ft)".center(CELL_WIDTH * 2)
+                    b_idx += 2
+                else: header += f"Bay{bay_id:02d}".ljust(CELL_WIDTH); b_idx += 1
+            print(header); print("-" * len(header))
+            for r_idx in range(MAX_ROWS):
+                row_str, has_content = "", False
+                b_idx_print = 0
+                while b_idx_print < len(BAYS):
+                    coords = (t_idx, b_idx_print, r_idx)
+                    if VALID_SLOT_MASK_20FT[coords]:
+                        content_val = tier_plan[b_idx_print, r_idx]
+                        if content_val != 0 and content_val != 'OCCUPIED_40FT':
+                            container = stowage_planner.container_dict[content_val]
+                            if container['size'] == 40:
+                                has_content = True
+                                row_str += f"{str(content_val)}".center(CELL_WIDTH * 2)
+                                b_idx_print += 2; continue
+                            else: has_content = True; row_str += str(content_val).ljust(CELL_WIDTH)
+                        else: row_str += ".".ljust(CELL_WIDTH)
+                    else: row_str += "".ljust(CELL_WIDTH)
+                    b_idx_print += 1
+                if has_content: print(f"Row {r_idx:02d}".ljust(CELL_WIDTH) + row_str)
