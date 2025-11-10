@@ -2,6 +2,11 @@ from formula import summarize_plan, get_containers, calculate_lcg, calculate_bes
 from pso_class import PSO_Stowage_Planner
 from ship_data import ship_data, datakondisikapal
 
+# Note:
+# Harus ada data container.xlsx di folder archive
+# Harus ada data ship_slot.xlsx di folder archive
+# ===========================================================
+
 # MARK: Default Variable Value
 TOTAL_VALID_SLOTS_20FT, NUM_20FT_TO_LOAD, NUM_40FT_TO_LOAD, SLOT_PROPERTIES_20FT, VALID_SLOT_MASK_20FT, VALID_PLACEMENTS_40FT, SLOT_PROPERTIES_40FT, MAX_ITERATIONS, TIERS, NUM_PARTICLES, WEIGHT_PENALTY, BAYS, MAX_ROWS, tanks = ship_data()
 
