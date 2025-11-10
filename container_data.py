@@ -126,3 +126,20 @@ def read_container_array(file_path: str = "container.xlsx") -> List[Dict[str, An
     df = df[cols]
 
     return df.to_dict(orient="records")
+
+def count_containers(containers):
+    # print("")
+    # print("Banyak Container", len(containers))
+    # print(containers[:1])  
+    # Banyak Container 100
+    # [{'no': 1, 'booking_no': nan, 'container_id': nan, 'bay': None, 'row': None, 'tier': None, 'slot': nan, 'load_port': 'IDSUB', 'discharge_port': 'IDJKT', 'container_iso': 2000, 'size_ft': 20, 'fe': 'F', 'weight_vgm_kg': 10.0, 'weight_ton': 0.01, 'un_no': None, 'dg_class': nan, 'group_type': nan, 'over_height': None, 'oversize_left': None, 'oversize_right': None, 'oversize_front': None, 'oversize_aft': None, 'carrier': nan, 'commodity': nan, 'weight_vgm': 10}]
+    
+    count_20ft = 0
+    count_40ft = 0
+    for item in containers:
+        iso = int(item['container_iso'])
+        if iso >= 2000 and iso < 3000:
+            count_20ft += 1
+        elif iso >= 4000 and iso < 5000:
+            count_40ft += 1
+    return count_20ft, count_40ft

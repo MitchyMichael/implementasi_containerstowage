@@ -4,7 +4,7 @@ import os, json, re
 import json
 
 from collections import defaultdict
-from container_data import read_container_array
+from container_data import count_containers, read_container_array
 from formula import build_ship_geometry, build_40ft_slots
 from pathlib import Path
 
@@ -198,36 +198,6 @@ def ship_data():
     # ===============================================================================================================================================
     bays, tiers, rows, slots = read_ship_xlsx_all(expected_sheets=["Bays", "Tiers", "Rows", "Slots"])
     containers = read_container_array("./archive/container.xlsx")
-    
-    # print("")
-    # print("Bay 1")
-    # print(bays[0])
-    # Bay 1
-    # {'no.': 1, 'bay id': 130, 'ship id': 2004, 'name': 'Bay 01', 'prev. bay id': 131, 'dist. to prev.': 0, 'next bay id': 131, 'dist. to next': 76, 'link bay id': 131, 'dist. to link': 0, 'inhold': True, 'base lcg': 126158, 'p': 6.23999977111816, 'l': 0, 'path': 'file:/C:/Users/ISTOW/iStowV2/assets/images//2004_MVPranalaContainerX_bay 1.png'}
-
-    # print("")
-    # print("Tier 1")
-    # print(tiers[0])
-    # Tier 1
-    # {'no.': 1, 'tier id': 82, 'ship id': 2004, 'name': 'TIER 02', 'inhold': True, 'base vcg': 1532, 'max height': 10652, 'path': 'file:/C:/Users/ISTOW/iStowV2/assets/images//2004_MVPranalaContainerX_tier-on-hold.png', 'break bulk': False, 'special desk': False, 'overwrite': 0, 'p': 119, 'bottom tier id': 0, 'bottom tier': nan, 'top tier id': 0, 'top tier': nan, 'list slot': nan}
-
-    # print("")
-    # print("Row 1")
-    # print(rows[0])
-    # Row 1
-    # {'no.': 1, 'row id': 151, 'ship id': 2004, 'name': 8, 'base tcg': -8853}
-
-    # print("")
-    # print("Slot 1")
-    # print(slots[0])
-    # Slot 1
-    # {'no.': 'Container', 'slot id': '1', 'bay': '0', 'row': 'nan', 'tier': 'nan', 'link bay': 'nan', 'link row': 'nan', 'link tier': 'nan', 'bottom bay': 'nan', 'bottom row': 'nan', 'bottom tier': 'nan', 'link slot': 'nan', 'bottom slot': 'nan', 'top slot': 'nan', 'left slot': 'nan', 'right slot': 'nan', 'front slot': 'nan', 'back slot': 'nan', 'segregation slot': 'nan', 'offset blcg': '0', 'offset bvcg': '2804', 'offset btcg': '0', 'rotated': 'False', 'p': '6058', 'l': '2438', 't': '2591'}
-
-    # print("")
-    # print("Banyak Container", len(containers))
-    # print(containers[:1])  
-    # Banyak Container 100
-    # [{'no': 1, 'booking_no': nan, 'container_id': nan, 'bay': None, 'row': None, 'tier': None, 'slot': nan, 'load_port': 'IDSUB', 'discharge_port': 'IDJKT', 'container_iso': 2000, 'size_ft': 20, 'fe': 'F', 'weight_vgm_kg': 10.0, 'weight_ton': 0.01, 'un_no': None, 'dg_class': nan, 'group_type': nan, 'over_height': None, 'oversize_left': None, 'oversize_right': None, 'oversize_front': None, 'oversize_aft': None, 'carrier': nan, 'commodity': nan, 'weight_vgm': 10}]
 
     # --- Data Fisik Kapal ---
     # Bay dari midship, negatif depan, positif belakang
@@ -258,7 +228,7 @@ def ship_data():
     TOTAL_VALID_SLOTS_20FT, TOTAL_VALID_SLOTS_40FT = len(SLOT_PROPERTIES_20FT), len(VALID_PLACEMENTS_40FT)
 
     # --- KONFIGURASI ALGORITMA ---
-    NUM_20FT_TO_LOAD, NUM_40FT_TO_LOAD = 0, 400
+    NUM_20FT_TO_LOAD, NUM_40FT_TO_LOAD = count_containers(containers)
     NUM_PARTICLES, MAX_ITERATIONS = 50, 200
     WEIGHT_PENALTY = {"vertical_moment": 0.0001, "longitudinal_balance": 100.0, "stability_tcg": 8000.0}
     
