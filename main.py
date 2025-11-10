@@ -3,7 +3,7 @@ from pso_class import PSO_Stowage_Planner
 from ship_data import ship_data, datakondisikapal
 
 # MARK: Default Variable Value
-TOTAL_VALID_SLOTS_20FT, NUM_20FT_TO_LOAD, NUM_40FT_TO_LOAD, SLOT_PROPERTIES_20FT, VALID_SLOT_MASK_20FT, VALID_PLACEMENTS_40FT, SLOT_PROPERTIES_40FT, MAX_ITERATIONS, TIERS, NUM_PARTICLES, WEIGHT_PENALTY, BAYS, MAX_ROWS = ship_data()
+TOTAL_VALID_SLOTS_20FT, NUM_20FT_TO_LOAD, NUM_40FT_TO_LOAD, SLOT_PROPERTIES_20FT, VALID_SLOT_MASK_20FT, VALID_PLACEMENTS_40FT, SLOT_PROPERTIES_40FT, MAX_ITERATIONS, TIERS, NUM_PARTICLES, WEIGHT_PENALTY, BAYS, MAX_ROWS, tanks = ship_data()
 
 all_containers = get_containers(TOTAL_VALID_SLOTS_20FT)
 if all_containers:
@@ -14,7 +14,7 @@ if all_containers:
         print(f"   - Butuh 40ft: {NUM_40FT_TO_LOAD}, Tersedia: {num_avail_40ft}")
     else:
         # Data kondisi kapal7
-        lightship_properties, tanks_data = datakondisikapal()
+        lightship_properties, tanks_data = datakondisikapal(tanks)
         target_lcg_value = calculate_lcg()
 
         # Buat instance planner dan jalankan optimasi

@@ -37,6 +37,7 @@ def read_ship_xlsx_all(expected_sheets: list[str] | None = None,
     rtiers = []
     rrows = []
     rslots = []
+    rtanks = []
 
     for sheet_name, data in data_by_sheet.items():
         if sheet_name.lower() == "bays":
@@ -59,8 +60,10 @@ def read_ship_xlsx_all(expected_sheets: list[str] | None = None,
                 })
                 
             rslots = new_slots
+        elif sheet_name.lower() == "tanks":
+            rtanks = data
             
-    return rbays, rtiers, rrows, rslots
+    return rbays, rtiers, rrows, rslots, rtanks
 
 def _coerce_numbers_in_records(rows: list[dict]) -> list[dict]:
     """Coba konversi string numerik ke angka (int/float) agar data lebih bersih."""
@@ -196,7 +199,7 @@ def find_allowed40ftbays(slots):
 # MARK: Default - Data Fisik Kapal
 def ship_data():
     # ===============================================================================================================================================
-    bays, tiers, rows, slots = read_ship_xlsx_all(expected_sheets=["Bays", "Tiers", "Rows", "Slots"])
+    bays, tiers, rows, slots, tanks = read_ship_xlsx_all(expected_sheets=["Bays", "Tiers", "Rows", "Slots", "Tanks"])
     containers = read_container_array("./archive/container.xlsx")
 
     # --- Data Fisik Kapal ---
@@ -232,27 +235,26 @@ def ship_data():
     NUM_PARTICLES, MAX_ITERATIONS = 50, 200
     WEIGHT_PENALTY = {"vertical_moment": 0.0001, "longitudinal_balance": 100.0, "stability_tcg": 8000.0}
     
-    return TOTAL_VALID_SLOTS_20FT, NUM_20FT_TO_LOAD, NUM_40FT_TO_LOAD, SLOT_PROPERTIES_20FT, VALID_SLOT_MASK_20FT, VALID_PLACEMENTS_40FT, SLOT_PROPERTIES_40FT, MAX_ITERATIONS, TIERS, NUM_PARTICLES, WEIGHT_PENALTY, BAYS, MAX_ROWS
+    return TOTAL_VALID_SLOTS_20FT, NUM_20FT_TO_LOAD, NUM_40FT_TO_LOAD, SLOT_PROPERTIES_20FT, VALID_SLOT_MASK_20FT, VALID_PLACEMENTS_40FT, SLOT_PROPERTIES_40FT, MAX_ITERATIONS, TIERS, NUM_PARTICLES, WEIGHT_PENALTY, BAYS, MAX_ROWS, tanks
 
 # MARK: Data Kondisi Kapal
-def datakondisikapal():
-    lightship_properties = {'weight': 5560400, 'lcg': 7.83, 'vcg': 4, 'tcg': 0}
-    tanks_data = [
-        {'name': 'FO Tank 1 Port', 'weight': 31618,  'lcg': -0.936, 'vcg': 12.647, 'tcg': -6.460},
-        {'name': 'FO Tank 1 Stbd', 'weight': 31618,  'lcg': -0.936, 'vcg': 12.647, 'tcg': 6.460},
-        {'name': 'AFT PEAK WB', 'weight': 131200, 'lcg': -72.192, 'vcg': 8.592, 'tcg': 0.00},
-        {'name': 'WB TK NO.1', 'weight': 547835, 'lcg': -68.995, 'vcg': 6.107, 'tcg': 0.0},
-        {'name': 'WB TK (P) NO.2', 'weight': 343807, 'lcg': -19.49, 'vcg': 2.455, 'tcg': -2.620},
-        {'name': 'WB TK (S) NO.2', 'weight': 240665, 'lcg': -19.49, 'vcg': 2.455, 'tcg': 2.620},
-        {'name': 'WB TK (P) NO.3', 'weight': 140146, 'lcg': -30.6236, 'vcg': 0.825, 'tcg': -3.493},
-        {'name': 'WB TK (S) NO.3', 'weight': 91095, 'lcg': -30.6236, 'vcg': 0.825, 'tcg': 3.493},
-        {'name': 'WB TK (P) NO.4', 'weight': 390410, 'lcg': 39.7517,  'vcg': 0.782, 'tcg': -4.922},
-        {'name': 'WB TK (S) NO.4', 'weight': 253766, 'lcg': 39.7517,  'vcg': 0.782, 'tcg': 4.922},
-        {'name': 'WB TK (P) NO.5', 'weight': 428948, 'lcg': 46.3378,  'vcg': 0.766, 'tcg': -5.347},
-        {'name': 'WB TK (S) NO.5', 'weight': 403211, 'lcg': 46.3378,  'vcg': 0.766, 'tcg': 5.347},
-        {'name': 'WB TK (P) NO.6', 'weight': 290775, 'lcg': 54.6918,  'vcg': 0.821, 'tcg': -4.099},
-        {'name': 'WB TK (S) NO.6', 'weight': 290775, 'lcg': 54.6918,  'vcg': 0.821, 'tcg': 4.099},
-        {'name': 'Sludge Tank', 'weight': 33430, 'lcg': -57.9533, 'vcg': 1.303, 'tcg': 0},
-        {'name': 'Bilge Holding Tank', 'weight': 10165, 'lcg': -58.9698, 'vcg': 1.105, 'tcg': -3.131}
-    ]
+def datakondisikapal(tanks):
+    lightship_data = tanks[0]
+    lightship_properties = {
+        'weight': lightship_data['lightship weight'],
+        'lcg': lightship_data['lightship lcg'],
+        'vcg': lightship_data['lightship vcg'],
+        'tcg': lightship_data['lightship tcg']
+    }
+    
+    tanks_data = []
+    for item in tanks:
+        tanks_data.append({
+            'name': item['name'],
+            'weight': item['weight'],
+            'lcg': item['lcg'],
+            'vcg': item['vcg'],
+            'tcg': item['tcg']
+        })
+    
     return lightship_properties, tanks_data
