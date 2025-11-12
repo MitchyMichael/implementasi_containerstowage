@@ -122,6 +122,7 @@ def get_containers(TOTAL_VALID_SLOTS_20FT):
         csv_filename = os.path.join(EXPORT_DIR, "containers_mapped.csv")
         all_containers = load_containers_from_csv(csv_filename) 
         return all_containers
+    
     else:
         # Membuat file CSV dummy jika tidak ada, untuk keperluan pengujian
         if not os.path.exists(csv_filename):

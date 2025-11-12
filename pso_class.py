@@ -26,6 +26,7 @@ class PSO_Stowage_Planner:
         self.container_dict = {c['id']: c for c in self.containers_to_load_20ft + self.containers_to_load_40ft}
         print(f"   - {len(self.containers_to_load_20ft)} kontainer 20ft dan {len(self.containers_to_load_40ft)} kontainer 40ft akan dimuat.")
 
+    # MARK: Base Plan
     def _create_base_plan(self, TIERS):
         """Membangun denah dasar yang dari awal sudah mematuhi semua aturan constraint, termasuk aturan On Deck."""
         print("🏗️  Membuat denah dasar yang valid (dengan aturan On Deck)...")
@@ -97,6 +98,7 @@ class PSO_Stowage_Planner:
                 self.gbest_fitness, self.gbest_position, self.gbest_summary = fitness, copy.deepcopy(position), summary
         print("Inisialisasi selesai.")
 
+    # MARK: Repair Plan
     # --- FUNGSI PERBAIKAN DENGAN ATURAN ON DECK BARU ---
     def _repair_plan(self, plan, TIERS):
         repaired_plan = np.zeros(self.position_shape, dtype=object)
@@ -197,6 +199,7 @@ class PSO_Stowage_Planner:
         summary = {"fitness": total_fitness, "ship_lcg": final_ship_lcg, "ship_vcg": final_ship_vcg, "ship_tcg": final_ship_tcg, "total_weight": total_weight}
         return total_fitness, summary
 
+    # MARK: Main
     def run(self, MAX_ITERATIONS, TIERS, NUM_PARTICLES, WEIGHT_PENALTY):
         base_plan = self._create_base_plan(TIERS)
         self._initialize_swarm(base_plan, NUM_PARTICLES, TIERS, WEIGHT_PENALTY)
@@ -227,8 +230,6 @@ class PSO_Stowage_Planner:
                     container_info, tier_id, row_index = self.container_dict[c_id], TIERS[coords[0]], coords[2]
                     bay_id_out = (BAYS[coords[1]] + 1) if container_info['size'] == 40 else BAYS[coords[1]]
                     bay_str, tier_str, row_str = f"{bay_id_out:02d}", f"{tier_id:02d}", f"{row_index:02d}"
-                    
-                    # Check row
                     row_str = value_by_indexed_order(int(MAX_ROWS), int(row_str)) 
                     
                     stowage_list.append({
