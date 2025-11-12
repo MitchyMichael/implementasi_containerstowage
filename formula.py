@@ -3,6 +3,8 @@ import os
 import pandas as pd
 import random
 
+from format_containerexcel import make_csv_from_excel
+
 # MARK: Build ship geo
 def build_ship_geometry(TIERS, BAYS, MAX_ROWS, SHIP_LAYOUT, ROW_MAP, BAY_MAP, TIER_MAP):
     """Membangun geometri kapal dari SHIP_LAYOUT."""
@@ -113,18 +115,25 @@ def get_containers(TOTAL_VALID_SLOTS_20FT):
 
     # Ganti nama file ini dengan nama file data kontainer Anda
     csv_filename = os.path.join(EXPORT_DIR, "containers.csv")
+    xlsx_filename = os.path.join("./archive", "container.xlsx")
+    if os.path.exists(xlsx_filename):
+        print("Ada file excel")
+        make_csv_from_excel("./archive/container.xlsx", "./export/containers_mapped.csv")
+        csv_filename = os.path.join(EXPORT_DIR, "containers_mapped.csv")
+        all_containers = load_containers_from_csv(csv_filename) 
+        return all_containers
+    else:
+        # Membuat file CSV dummy jika tidak ada, untuk keperluan pengujian
+        if not os.path.exists(csv_filename):
+            print(f"File '{csv_filename}' tidak ditemukan. Membuat file dummy...")
+            num_total_containers = TOTAL_VALID_SLOTS_20FT 
+            ids = [f'CONT{i:04d}' for i in range(1, num_total_containers + 1)]
+            weights = [random.uniform(5, 28) for _ in range(num_total_containers)]
+            sizes = [40 if random.random() < 0.35 else 20 for _ in range(num_total_containers)]
+            pd.DataFrame({'Container_ID': ids, 'Weight_ton': weights, 'Size': sizes}).to_csv(csv_filename, index=False)
 
-    # Membuat file CSV dummy jika tidak ada, untuk keperluan pengujian
-    if not os.path.exists(csv_filename):
-        print(f"File '{csv_filename}' tidak ditemukan. Membuat file dummy...")
-        num_total_containers = TOTAL_VALID_SLOTS_20FT 
-        ids = [f'CONT{i:04d}' for i in range(1, num_total_containers + 1)]
-        weights = [random.uniform(5, 28) for _ in range(num_total_containers)]
-        sizes = [40 if random.random() < 0.35 else 20 for _ in range(num_total_containers)]
-        pd.DataFrame({'Container_ID': ids, 'Weight_ton': weights, 'Size': sizes}).to_csv(csv_filename, index=False)
-
-    all_containers = load_containers_from_csv(csv_filename) 
-    return all_containers
+        all_containers = load_containers_from_csv(csv_filename) 
+        return all_containers
 
 # MARK: Formula Target LCG Value
 def calculate_lcg():
@@ -147,7 +156,7 @@ def calculate_lcg():
     return target_lcg_value
 
 # MARK: Formula Best Plan
-def calculate_bestplan(best_plan, stowage_planner, BAYS, TIERS, MAX_ROWS, VALID_SLOT_MASK_20FT):
+def print_bestplan(best_plan, stowage_planner, BAYS, TIERS, MAX_ROWS, VALID_SLOT_MASK_20FT):
     print("\n\n--- 🗂️ Denah Muatan Lengkap (Tampilan per Tier dari Atas ke Bawah) ---")
     CELL_WIDTH = 12
     for tier_id in sorted(TIERS, reverse=True):
@@ -164,21 +173,51 @@ def calculate_bestplan(best_plan, stowage_planner, BAYS, TIERS, MAX_ROWS, VALID_
                     b_idx += 2
                 else: header += f"Bay{bay_id:02d}".ljust(CELL_WIDTH); b_idx += 1
             print(header); print("-" * len(header))
-            for r_idx in range(MAX_ROWS):
-                row_str, has_content = "", False
-                b_idx_print = 0
-                while b_idx_print < len(BAYS):
-                    coords = (t_idx, b_idx_print, r_idx)
-                    if VALID_SLOT_MASK_20FT[coords]:
-                        content_val = tier_plan[b_idx_print, r_idx]
-                        if content_val != 0 and content_val != 'OCCUPIED_40FT':
-                            container = stowage_planner.container_dict[content_val]
-                            if container['size'] == 40:
-                                has_content = True
-                                row_str += f"{str(content_val)}".center(CELL_WIDTH * 2)
-                                b_idx_print += 2; continue
-                            else: has_content = True; row_str += str(content_val).ljust(CELL_WIDTH)
-                        else: row_str += ".".ljust(CELL_WIDTH)
-                    else: row_str += "".ljust(CELL_WIDTH)
-                    b_idx_print += 1
-                if has_content: print(f"Row {r_idx:02d}".ljust(CELL_WIDTH) + row_str)
+            
+            print("MAX_ROWS", MAX_ROWS)
+            evens = list(range(MAX_ROWS - 1, -1, -1))  # 8..0
+            evens = [n for n in evens if n % 2 == 0]
+            odds = [n for n in range(MAX_ROWS) if n % 2 == 1]
+            order = evens + odds
+
+            # Kalau row ganjil
+            if MAX_ROWS%2 != 0:
+                for i, r_idx in enumerate(range(MAX_ROWS)):
+                    row_str, has_content = "", False
+                    b_idx_print = 0
+                    while b_idx_print < len(BAYS):
+                        coords = (t_idx, b_idx_print, r_idx)
+                        if VALID_SLOT_MASK_20FT[coords]:
+                            content_val = tier_plan[b_idx_print, r_idx]
+                            if content_val != 0 and content_val != 'OCCUPIED_40FT':
+                                container = stowage_planner.container_dict[content_val]
+                                if container['size'] == 40:
+                                    has_content = True
+                                    row_str += f"{str(content_val)}".center(CELL_WIDTH * 2)
+                                    b_idx_print += 2; continue
+                                else: has_content = True; row_str += str(content_val).ljust(CELL_WIDTH)
+                            else: row_str += ".".ljust(CELL_WIDTH)
+                        else: row_str += "".ljust(CELL_WIDTH)
+                        b_idx_print += 1
+                    if has_content: print(f"Row {order[i]:02d}".ljust(CELL_WIDTH) + row_str)
+            
+            # Kalau row genap
+            else:
+                for i, r_idx in enumerate(range(MAX_ROWS)):
+                    row_str, has_content = "", False
+                    b_idx_print = 0
+                    while b_idx_print < len(BAYS):
+                        coords = (t_idx, b_idx_print, r_idx)
+                        if VALID_SLOT_MASK_20FT[coords]:
+                            content_val = tier_plan[b_idx_print, r_idx]
+                            if content_val != 0 and content_val != 'OCCUPIED_40FT':
+                                container = stowage_planner.container_dict[content_val]
+                                if container['size'] == 40:
+                                    has_content = True
+                                    row_str += f"{str(content_val)}".center(CELL_WIDTH * 2)
+                                    b_idx_print += 2; continue
+                                else: has_content = True; row_str += str(content_val).ljust(CELL_WIDTH)
+                            else: row_str += ".".ljust(CELL_WIDTH)
+                        else: row_str += "".ljust(CELL_WIDTH)
+                        b_idx_print += 1
+                    if has_content: print(f"Row {(int(order[i]+1)):02d}".ljust(CELL_WIDTH) + row_str)

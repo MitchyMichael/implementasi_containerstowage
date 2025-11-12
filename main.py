@@ -1,4 +1,4 @@
-from formula import summarize_plan, get_containers, calculate_lcg, calculate_bestplan
+from formula import summarize_plan, get_containers, calculate_lcg, print_bestplan
 from pso_class import PSO_Stowage_Planner
 from ship_data import ship_data, datakondisikapal
 
@@ -34,5 +34,5 @@ if all_containers:
         # Tampilkan hasil ringkasan dan denah
         summarize_plan(best_summary, target_lcg_value)
         if best_plan is not None:
-            calculate_bestplan(best_plan, stowage_planner, BAYS, TIERS, MAX_ROWS, VALID_SLOT_MASK_20FT)
-            stowage_planner.export_plan_to_excel(best_plan, TIERS, BAYS, "Hasil_Stowage_Plan_Final.xlsx")
+            print_bestplan(best_plan, stowage_planner, BAYS, TIERS, MAX_ROWS, VALID_SLOT_MASK_20FT)
+            stowage_planner.export_plan_to_excel(best_plan, TIERS, BAYS, MAX_ROWS, "hasilstowageplan.xlsx")

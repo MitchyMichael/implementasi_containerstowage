@@ -137,9 +137,9 @@ def count_containers(containers):
     count_20ft = 0
     count_40ft = 0
     for item in containers:
-        iso = int(item['container_iso'])
-        if iso >= 2000 and iso < 3000:
+        iso = int(str(item['container_iso'])[0])
+        if iso == 2:
             count_20ft += 1
-        elif iso >= 4000 and iso < 5000:
+        elif iso == 4:
             count_40ft += 1
     return count_20ft, count_40ft

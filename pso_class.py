@@ -1,4 +1,6 @@
 from collections import defaultdict
+from openpyxl.styles import Font
+
 import numpy as np
 import pandas as pd
 import copy
@@ -209,7 +211,7 @@ class PSO_Stowage_Planner:
         print("\n--- Optimasi Selesai ---")
         return self.gbest_position, self.gbest_summary
 
-    def export_plan_to_excel(self, plan, TIERS, BAYS, filename="stowage_plan.xlsx"):
+    def export_plan_to_excel(self, plan, TIERS, BAYS, MAX_ROWS, filename="stowage_plan.xlsx"):
         try:
             from pathlib import Path
 
@@ -225,24 +227,62 @@ class PSO_Stowage_Planner:
                     container_info, tier_id, row_index = self.container_dict[c_id], TIERS[coords[0]], coords[2]
                     bay_id_out = (BAYS[coords[1]] + 1) if container_info['size'] == 40 else BAYS[coords[1]]
                     bay_str, tier_str, row_str = f"{bay_id_out:02d}", f"{tier_id:02d}", f"{row_index:02d}"
+                    
+                    # Check row
+                    row_str = value_by_indexed_order(int(MAX_ROWS), int(row_str)) 
+                    
                     stowage_list.append({
-                        'Container_ID': c_id,
-                        'Weight_ton': container_info['weight']/1000,
+                        'No.': "",
+                        'Booking No.': "",
+                        'Container ID': c_id,
+                        'Weight (VGM)': container_info['weight']/1000,
                         'Bay': bay_str,
                         'Row': row_str,
                         'Tier': tier_str,
-                        'slot': f"{bay_str}{row_str}{tier_str}",
+                        'Slot': f"{bay_str}{row_str}{tier_str}",
                         'Load Port': 'IDJKT',
                         'Discharge Port': 'IDSUB',
                         'Container ISO': '45G1' if container_info['size'] == 40 else '22G1',
-                        'F/E': 'F'
+                        'F/E': 'F',
+                        'UN No.': "",
+                        'DG Class': "",
+                        "Group Type": "",
+                        "Over Height": "",
+                        "Over Size Left": "",
+                        "Over Size Right": "",
+                        "Over Size Front": "",
+                        "Over Size Aft": "",
+                        "Carrier": "",
+                        "Commodity": ""
                     })
             if stowage_list:
                 df_export = pd.DataFrame(stowage_list).sort_values(by=['Bay', 'Row', 'Tier'])
-                final_order = ['Container_ID', 'Bay', 'Row', 'Tier', 'slot', 'Load Port', 'Discharge Port', 'Container ISO', 'F/E', 'Weight_ton']
-                df_export[final_order].to_excel(out_path, index=False)
+                final_order = [
+                    'No.', 'Booking No.', 'Container ID', 'Bay', 'Row', 'Tier', 'Slot', 'Load Port', 'Discharge Port', 'Container ISO', 'F/E', 'Weight (VGM)',
+                    'UN No.', 'DG Class', 'Group Type', 'Over Height', 'Over Size Left', 'Over Size Right', 'Over Size Front', 'Over Size Aft', 'Carrier', 'Commodity'
+                ]
+                with pd.ExcelWriter(out_path, engine="openpyxl") as writer:
+                    df_export[final_order].to_excel(writer, index=False, sheet_name="Stowage Plan")
                 print(f"✅ Berhasil! Denah muatan telah disimpan sebagai '{out_path}'.")
             else:
                 print("⚠️ Tidak ada kontainer untuk diekspor.")
         except Exception as e:
             print(f"❌ Gagal mengekspor ke Excel: {e}")
+            
+def generate_order(n: int) -> list[int]:
+    if n <= 0:
+        return []
+    if n % 2 == 1:  # ganjil
+        evens_desc = list(range(n - 1, -1, -2))   # ... 8,6,4,2,0
+        odds_asc   = list(range(1, n - 1, 2))     # ... 1,3,5,7
+    else:           # genap
+        evens_desc = list(range(n, 1, -2))        # ... 8,6,4,2
+        odds_asc   = list(range(1, n, 2))         # ... 1,3,5,7
+    return evens_desc + odds_asc
+
+def value_by_indexed_order(n: int, x: int):
+    order = generate_order(n)
+    if 0 <= x < len(order):
+        v = order[x]
+        return f"{v:02d}"  # selalu 2 digit
+    return None
