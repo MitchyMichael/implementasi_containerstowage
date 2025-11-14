@@ -28,18 +28,24 @@ class PSO_Stowage_Planner:
 
     # MARK: Base Plan
     def _create_base_plan(self, TIERS):
-        """Membangun denah dasar yang dari awal sudah mematuhi semua aturan constraint, termasuk aturan On Deck."""
-        print("🏗️  Membuat denah dasar yang valid (dengan aturan On Deck)...")
+        """Membangun denah dasar yang dari awal sudah mematuhi semua aturan constraint, termasuk aturan On Deck.
+        MODIFIKASI: Menempatkan kontainer 20ft TERLEBIH DAHULU, baru 40ft."""
+        print("🏗️  Membuat denah dasar yang valid (dengan aturan On Deck) - 20ft DULU...")
         base_position = np.zeros(self.position_shape, dtype=object)
 
-        # 1. Tempatkan semua kontainer 40ft
-        slots_40ft_sorted = sorted(self.valid_placements_40ft, key=lambda c: self.slot_properties_40ft[c]['vcg'])
-        for i in range(min(len(self.containers_to_load_40ft), len(slots_40ft_sorted))):
-            container, coords = self.containers_to_load_40ft[i], slots_40ft_sorted[i]
-            t_idx, b_idx, r_idx = coords
-            base_position[t_idx, b_idx, r_idx], base_position[t_idx, b_idx + 1, r_idx] = container['id'], 'OCCUPIED_40FT'
+        # ========== PERUBAHAN: 20FT DULU ==========
+        # 1. Tempatkan semua kontainer 20ft terlebih dahulu
+        slots_20ft_sorted = sorted(
+            self.valid_slots_coords_20ft, 
+            key=lambda c: self.slot_properties_20ft[c]['vcg']
+        )
+        
+        for i, container in enumerate(self.containers_to_load_20ft):
+            if i < len(slots_20ft_sorted):
+                coords = slots_20ft_sorted[i]
+                base_position[coords] = container['id']
 
-        # 2. Setelah 40ft ditempatkan, tentukan semua "plafon" di Under Deck
+        # 2. Setelah 20ft ditempatkan, tentukan semua "plafon" di Under Deck
         ceilings = {}
         for b_idx in range(self.position_shape[1]):
             for r_idx in range(self.position_shape[2]):
@@ -50,38 +56,47 @@ class PSO_Stowage_Planner:
                 if max_tier != -1:
                     ceilings[(b_idx, r_idx)] = max_tier
         
-        # 3. Cari semua slot 20ft yang aman dengan aturan On Deck/Under Deck
-        safe_20ft_slots = []
-        for coords in self.valid_slots_coords_20ft:
+        # 3. Cari semua slot 40ft yang aman dengan aturan On Deck/Under Deck
+        safe_40ft_slots = []
+        for coords in self.valid_placements_40ft:
             t_idx, b_idx, r_idx = coords
             tier_id = TIERS[t_idx]
             
-            # Lewati jika slot sudah terisi
-            if base_position[coords] != 0:
-                continue
-
+            # Cek apakah kedua slot 40ft kosong
+            slot1 = (t_idx, b_idx, r_idx)
+            slot2 = (t_idx, b_idx + 1, r_idx)
+            
+            if base_position[slot1] != 0 or base_position[slot2] != 0:
+                continue  # Salah satu atau kedua slot sudah terisi
+            
             is_safe = False
             # Cek apakah slot berada di Under Deck atau On Deck
-            if tier_id < 82: # UNDER DECK
-                ceiling = ceilings.get((b_idx, r_idx), -1)
-                if ceiling == -1 or t_idx < ceiling:
+            if tier_id < 82:  # UNDER DECK
+                ceiling1 = ceilings.get((b_idx, r_idx), -1)
+                ceiling2 = ceilings.get((b_idx + 1, r_idx), -1)
+                
+                # Kedua slot harus di bawah ceiling (atau belum ada ceiling)
+                if (ceiling1 == -1 or t_idx < ceiling1) and (ceiling2 == -1 or t_idx < ceiling2):
                     is_safe = True
-            else: # ON DECK
-                is_safe = True # Aturan plafon tidak berlaku di On Deck
+            else:  # ON DECK
+                is_safe = True  # Aturan plafon tidak berlaku di On Deck
             
             if is_safe:
-                safe_20ft_slots.append(coords)
+                safe_40ft_slots.append(coords)
         
-        safe_20ft_slots.sort(key=lambda c: self.slot_properties_20ft[c]['vcg'])
+        safe_40ft_slots.sort(key=lambda c: self.slot_properties_40ft[c]['vcg'])
 
-        # 4. Isi slot-slot aman tersebut dengan kontainer 20ft
-        for i, cid_data in enumerate(self.containers_to_load_20ft):
-            if i < len(safe_20ft_slots):
-                base_position[safe_20ft_slots[i]] = cid_data['id']
+        # 4. Isi slot-slot aman tersebut dengan kontainer 40ft
+        for i, cid_data in enumerate(self.containers_to_load_40ft):
+            if i < len(safe_40ft_slots):
+                coords = safe_40ft_slots[i]
+                base_position[coords] = cid_data['id']
+                base_position[coords[0], coords[1] + 1, coords[2]] = 'OCCUPIED_40FT'
             else:
                 break
         
         return self._repair_plan(base_position, TIERS)
+
 
 
     def _initialize_swarm(self, base_plan, NUM_PARTICLES, TIERS, WEIGHT_PENALTY):
@@ -101,17 +116,21 @@ class PSO_Stowage_Planner:
     # MARK: Repair Plan
     # --- FUNGSI PERBAIKAN DENGAN ATURAN ON DECK BARU ---
     def _repair_plan(self, plan, TIERS):
+        """Perbaikan denah dengan aturan On Deck.
+        MODIFIKASI: Mengunci posisi 20ft terlebih dahulu, baru menyesuaikan 40ft."""
         repaired_plan = np.zeros(self.position_shape, dtype=object)
         
-        # 1. Kunci semua posisi 40ft
-        containers_40ft = []
+        # ========== PERUBAHAN: 20FT DULU ==========
+        # 1. Kunci semua posisi 20ft terlebih dahulu
+        containers_20ft = []
         for coords, cid in np.ndenumerate(plan):
-            if cid != 0 and cid != 'OCCUPIED_40FT' and self.container_dict.get(cid) and self.container_dict[cid]['size'] == 40:
+            if (cid != 0 and cid != 'OCCUPIED_40FT' and 
+                self.container_dict.get(cid) and 
+                self.container_dict[cid]['size'] == 20):
                 repaired_plan[coords] = cid
-                repaired_plan[coords[0], coords[1]+1, coords[2]] = 'OCCUPIED_40FT'
-                containers_40ft.append(cid)
+                containers_20ft.append(cid)
         
-        # 2. Tentukan semua "plafon"
+        # 2. Tentukan semua "plafon" berdasarkan posisi 20ft
         ceilings = {}
         for b_idx in range(self.position_shape[1]):
             for r_idx in range(self.position_shape[2]):
@@ -122,35 +141,52 @@ class PSO_Stowage_Planner:
                 if max_tier != -1:
                     ceilings[(b_idx, r_idx)] = max_tier
         
-        # 3. Kumpulkan & urutkan SEMUA kontainer 20ft
-        all_20ft_containers = [cid for cid in np.ravel(plan) if cid != 0 and cid != 'OCCUPIED_40FT' and self.container_dict.get(cid) and self.container_dict[cid]['size'] == 20]
-        sorted_20ft_ids = sorted(all_20ft_containers, key=lambda cid: self.container_dict[cid]['weight'], reverse=True)
+        # 3. Kumpulkan & urutkan SEMUA kontainer 40ft
+        all_40ft_containers = [
+            cid for cid in np.ravel(plan) 
+            if (cid != 0 and cid != 'OCCUPIED_40FT' and 
+                self.container_dict.get(cid) and 
+                self.container_dict[cid]['size'] == 40)
+        ]
+        sorted_40ft_ids = sorted(
+            all_40ft_containers, 
+            key=lambda cid: self.container_dict[cid]['weight'], 
+            reverse=True
+        )
 
-        # 4. Cari SEMUA slot yang aman untuk 20ft dengan aturan On Deck/Under Deck
-        safe_20ft_slots = []
-        for coords in self.valid_slots_coords_20ft:
+        # 4. Cari SEMUA slot yang aman untuk 40ft dengan aturan On Deck/Under Deck
+        safe_40ft_slots = []
+        for coords in self.valid_placements_40ft:
             t_idx, b_idx, r_idx = coords
             tier_id = TIERS[t_idx]
 
-            if repaired_plan[coords] != 0: continue
+            # Cek apakah kedua slot kosong
+            if repaired_plan[coords] != 0 or repaired_plan[t_idx, b_idx + 1, r_idx] != 0:
+                continue
 
             is_safe = False
-            if tier_id < 82: # UNDER DECK
-                ceiling = ceilings.get((b_idx, r_idx), -1)
-                if ceiling == -1 or t_idx < ceiling:
+            if tier_id < 82:  # UNDER DECK
+                ceiling1 = ceilings.get((b_idx, r_idx), -1)
+                ceiling2 = ceilings.get((b_idx + 1, r_idx), -1)
+                
+                # Kedua slot harus di bawah ceiling
+                if ((ceiling1 == -1 or t_idx < ceiling1) and 
+                    (ceiling2 == -1 or t_idx < ceiling2)):
                     is_safe = True
-            else: # ON DECK
+            else:  # ON DECK
                 is_safe = True
             
             if is_safe:
-                safe_20ft_slots.append(coords)
+                safe_40ft_slots.append(coords)
         
-        safe_20ft_slots.sort(key=lambda c: self.slot_properties_20ft[c]['vcg'])
+        safe_40ft_slots.sort(key=lambda c: self.slot_properties_40ft[c]['vcg'])
 
-        # 5. Isi kembali slot aman dengan kontainer 20ft terurut
-        for i, cid in enumerate(sorted_20ft_ids):
-            if i < len(safe_20ft_slots):
-                repaired_plan[safe_20ft_slots[i]] = cid
+        # 5. Isi kembali slot aman dengan kontainer 40ft terurut
+        for i, cid in enumerate(sorted_40ft_ids):
+            if i < len(safe_40ft_slots):
+                coords = safe_40ft_slots[i]
+                repaired_plan[coords] = cid
+                repaired_plan[coords[0], coords[1] + 1, coords[2]] = 'OCCUPIED_40FT'
 
         return repaired_plan
 
